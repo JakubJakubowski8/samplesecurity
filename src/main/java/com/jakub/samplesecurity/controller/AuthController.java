@@ -1,13 +1,18 @@
 package com.jakub.samplesecurity.controller;
 
 import com.jakub.samplesecurity.exception.AppException;
+import com.jakub.samplesecurity.exception.ResourceNotFoundException;
+import com.jakub.samplesecurity.model.ConfirmationToken;
+import com.jakub.samplesecurity.payload.ResetPasswordRequest;
 import com.jakub.samplesecurity.model.Role;
 import com.jakub.samplesecurity.model.RoleName;
 import com.jakub.samplesecurity.model.User;
 import com.jakub.samplesecurity.payload.ApiResponse;
+import com.jakub.samplesecurity.payload.ForgotPasswordRequest;
 import com.jakub.samplesecurity.payload.JwtAuthenticationResponse;
 import com.jakub.samplesecurity.payload.LoginRequest;
 import com.jakub.samplesecurity.payload.SignUpRequest;
+import com.jakub.samplesecurity.repository.ConfirmationTokenRepository;
 import com.jakub.samplesecurity.repository.RoleRepository;
 import com.jakub.samplesecurity.repository.UserRepository;
 import com.jakub.samplesecurity.security.JwtTokenProvider;
@@ -23,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -37,6 +43,7 @@ public class AuthController {
   private AuthenticationManager authenticationManager;
   private UserRepository userRepository;
   private RoleRepository roleRepository;
+  private ConfirmationTokenRepository confirmationTokenRepository;
   private PasswordEncoder passwordEncoder;
   private JwtTokenProvider tokenProvider;
 
@@ -45,12 +52,14 @@ public class AuthController {
                         UserRepository userRepository,
                         RoleRepository roleRepository,
                         PasswordEncoder passwordEncoder,
-                        JwtTokenProvider tokenProvider) {
+                        JwtTokenProvider tokenProvider,
+                        ConfirmationTokenRepository confirmationTokenRepository) {
     this.authenticationManager = authenticationManager;
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
     this.passwordEncoder = passwordEncoder;
     this.tokenProvider = tokenProvider;
+    this.confirmationTokenRepository = confirmationTokenRepository;
   }
 
   @PostMapping("/signin")
@@ -72,7 +81,7 @@ public class AuthController {
   @PostMapping("/signup")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
     if(userRepository.existsByUsername(signUpRequest.getUsername())) {
-      return new ResponseEntity(new ApiResponse(false, "Username is already taken!"),
+      return new ResponseEntity(new ApiResponse(false, "Username is already taken!", ""),
           HttpStatus.BAD_REQUEST);
     }
 
@@ -92,6 +101,39 @@ public class AuthController {
         .fromCurrentContextPath().path("/users/{username}")
         .buildAndExpand(result.getUsername()).toUri();
 
-    return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
+    return ResponseEntity.created(location).body(new ApiResponse(true, "User registered " +
+        "successfully", ""));
+  }
+
+  @PostMapping(value="/forgot-password")
+  public ResponseEntity<?> forgotUserPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+
+    User existingUser = userRepository.findByUsername(forgotPasswordRequest.getUsername())
+        .orElseThrow(() -> new ResourceNotFoundException("User", "username",
+            forgotPasswordRequest.getUsername()));
+
+      ConfirmationToken confirmationToken = new ConfirmationToken(existingUser);
+
+      confirmationTokenRepository.save(confirmationToken);
+
+    return ResponseEntity.ok(new ApiResponse(true, "Password reseted successfully! Send request " +
+        "with new password to bellow url",
+        "http://localhost:8080/api/auth/reset-password?token=" + confirmationToken.getConfirmationToken()));
+  }
+
+  @PostMapping(value="/reset-password")
+  public ResponseEntity<?> forgotUserPassword(@Valid @RequestParam("token") String token,
+                                              @Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+
+    ConfirmationToken confirmationToken = confirmationTokenRepository.findByConfirmationToken(token)
+        .orElseThrow(() -> new ResourceNotFoundException("Forgot password token", "token",
+            token));
+    User user = confirmationToken.getUser();
+    user.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
+
+    userRepository.saveAndFlush(user);
+    confirmationTokenRepository.delete(confirmationToken);
+
+    return ResponseEntity.ok(new ApiResponse(true, "Password reseted successfully!", ""));
   }
 }
