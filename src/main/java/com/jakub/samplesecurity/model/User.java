@@ -1,6 +1,9 @@
 package com.jakub.samplesecurity.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jakub.samplesecurity.model.audit.DateAudit;
+
+import net.minidev.json.annotate.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +37,7 @@ public class User extends DateAudit {
   @Size(max = 15)
   private String username;
 
+  @JsonIgnore
   @NotBlank
   @Size(max = 100)
   private String password;
@@ -44,12 +48,9 @@ public class User extends DateAudit {
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Role> roles = new HashSet<>();
 
-  public User(String username) {
-    this.username = username;
-  }
-
-  public Long getId() {
-    return id;
+  @JsonProperty("password")
+  public String getPassword() {
+    return password;
   }
 
   public Set<String> getRoleStringNames() {

@@ -8,7 +8,7 @@ import com.jakub.samplesecurity.payload.ApiResponse;
 import com.jakub.samplesecurity.payload.ForgotPasswordRequest;
 import com.jakub.samplesecurity.payload.JwtAuthenticationResponse;
 import com.jakub.samplesecurity.payload.LoginRequest;
-import com.jakub.samplesecurity.payload.SignUpRequest;
+import com.jakub.samplesecurity.payload.UserRequest;
 import com.jakub.samplesecurity.repository.ConfirmationTokenRepository;
 import com.jakub.samplesecurity.repository.RoleRepository;
 import com.jakub.samplesecurity.repository.UserRepository;
@@ -36,29 +36,26 @@ import java.net.URI;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-  private AuthenticationManager authenticationManager;
-  private UserRepository userRepository;
-  private RoleRepository roleRepository;
-  private ConfirmationTokenRepository confirmationTokenRepository;
-  private PasswordEncoder passwordEncoder;
-  private JwtTokenProvider tokenProvider;
+  private final AuthenticationManager authenticationManager;
+  private final UserRepository userRepository;
+  private final ConfirmationTokenRepository confirmationTokenRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final JwtTokenProvider tokenProvider;
 
   @Autowired
   public AuthController(AuthenticationManager authenticationManager,
                         UserRepository userRepository,
-                        RoleRepository roleRepository,
                         PasswordEncoder passwordEncoder,
                         JwtTokenProvider tokenProvider,
                         ConfirmationTokenRepository confirmationTokenRepository) {
     this.authenticationManager = authenticationManager;
     this.userRepository = userRepository;
-    this.roleRepository = roleRepository;
     this.passwordEncoder = passwordEncoder;
     this.tokenProvider = tokenProvider;
     this.confirmationTokenRepository = confirmationTokenRepository;
   }
 
-  @PostMapping("/signin")
+  @PostMapping("/login")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
     Authentication authentication = authenticationManager.authenticate(
@@ -75,16 +72,16 @@ public class AuthController {
   }
 
   @PostMapping("/signup")
-  public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-    if(userRepository.existsByUsername(signUpRequest.getUsername())) {
+  public ResponseEntity<?> registerUser(@Valid @RequestBody UserRequest userRequest) {
+    if(userRepository.existsByUsername(userRequest.getUsername())) {
       return new ResponseEntity(new ApiResponse(false, "Username is already taken!", ""),
           HttpStatus.BAD_REQUEST);
     }
 
-    // Creating user's account
-    User user = new User(signUpRequest.getUsername());
+    User user = new User();
 
-    user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+    user.setUsername(userRequest.getUsername());
+    user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
     User result = userRepository.save(user);
 
@@ -122,7 +119,7 @@ public class AuthController {
     User user = confirmationToken.getUser();
     user.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
 
-    userRepository.saveAndFlush(user);
+    userRepository.save(user);
     confirmationTokenRepository.delete(confirmationToken);
 
     return ResponseEntity.ok(new ApiResponse(true, "Password reseted successfully!", ""));

@@ -1,53 +1,68 @@
 package com.jakub.samplesecurity.controller;
 
-import com.jakub.samplesecurity.exception.ResourceNotFoundException;
 import com.jakub.samplesecurity.model.User;
-import com.jakub.samplesecurity.payload.UserIdentityAvailability;
-import com.jakub.samplesecurity.payload.UserProfile;
-import com.jakub.samplesecurity.repository.UserRepository;
-import com.jakub.samplesecurity.security.CurrentUser;
-import com.jakub.samplesecurity.security.UserPrincipal;
+import com.jakub.samplesecurity.payload.ApiResponse;
+import com.jakub.samplesecurity.payload.UserRequest;
+import com.jakub.samplesecurity.service.UserService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
 public class UserController {
 
-  private UserRepository userRepository;
+  private final UserService userService;
 
   @Autowired
-  public UserController(UserRepository userRepository) {
-
-    this.userRepository = userRepository;
+  public UserController(UserService userService) {
+    this.userService = userService;
   }
 
-  private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
-  @GetMapping("/user/me")
-  @PreAuthorize("hasRole('ADMIN')")
-  public UserProfile getCurrentUser(@CurrentUser UserPrincipal currentUser) {
-    return new UserProfile(currentUser.getId(), currentUser.getUsername());
-  }
-
-  @GetMapping("/user/checkUsernameAvailability")
-  @PreAuthorize("isAnonymous()")
-  public UserIdentityAvailability checkUsernameAvailability(@RequestParam(value = "username") String username) {
-    Boolean isAvailable = !userRepository.existsByUsername(username);
-    return new UserIdentityAvailability(isAvailable);
-  }
-
-  @GetMapping("/users/{username}")
+  @PostMapping("/user/create")
   @PreAuthorize("hasRole('CREATE_USER')")
-  public UserProfile getUserProfile(@PathVariable(value = "username") String username) {
-    User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+  public ResponseEntity<?> createUser(@Valid @RequestBody UserRequest userRequest) {
 
-    return new UserProfile(user.getId(), user.getUsername(), user.getCreatedAt());
+    User user = userService.createUser(userRequest);
+
+    return new ResponseEntity<>(new ApiResponse(true, "User registered successfully!", ""),
+        HttpStatus.CREATED);
   }
 
+  @PutMapping("/user/update")
+  @PreAuthorize("hasRole('UPDATE_USER')")
+  public ResponseEntity<?> updateUser(@Valid @RequestBody UserRequest userRequest) {
+
+    User user = userService.updateUser(userRequest);
+
+    return new ResponseEntity<>(new ApiResponse(true, "User updated successfully!", ""),
+        HttpStatus.OK);
+  }
+
+  @DeleteMapping("/user/delete/{id}")
+  @PreAuthorize("hasRole('DELETE_USER')")
+  public ResponseEntity<?> updateUser(@PathVariable(value = "id") Long id) {
+
+    userService.deleteUser(id);
+
+    return new ResponseEntity<>(new ApiResponse(true, "User deleted successfully!", ""),
+        HttpStatus.OK);
+  }
+
+  @GetMapping("/user/all")
+  @PreAuthorize("hasRole('LIST_USER')")
+  public ResponseEntity<?> getAllUsers(Pageable pageable) {
+
+    Page<User> userPage = userService.findAllUsers(pageable);
+    userPage.getContent();
+    return new ResponseEntity<>(userPage,
+        HttpStatus.OK);
+  }
 }

@@ -90,16 +90,15 @@ import java.util.Set;
     }
 
     @Transactional
-    private User createUserIfNotFound(final String username, final String password,
+    private void createUserIfNotFound(final String username, final String password,
                                       final Set<Role> roles) {
 
       if (!userRepository.existsByUsername(username)) {
-        User user = new User(username);
+        User user = new User();
+        user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         user.setRoles(roles);
-        user = userRepository.save(user);
-        return user;
+        userRepository.save(user);
       }
-      return null;
     }
   }
