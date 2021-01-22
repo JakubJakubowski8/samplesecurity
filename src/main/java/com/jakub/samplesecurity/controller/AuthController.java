@@ -1,11 +1,8 @@
 package com.jakub.samplesecurity.controller;
 
-import com.jakub.samplesecurity.exception.AppException;
 import com.jakub.samplesecurity.exception.ResourceNotFoundException;
 import com.jakub.samplesecurity.model.ConfirmationToken;
 import com.jakub.samplesecurity.payload.ResetPasswordRequest;
-import com.jakub.samplesecurity.model.Role;
-import com.jakub.samplesecurity.model.RoleName;
 import com.jakub.samplesecurity.model.User;
 import com.jakub.samplesecurity.payload.ApiResponse;
 import com.jakub.samplesecurity.payload.ForgotPasswordRequest;
@@ -34,7 +31,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -90,11 +86,6 @@ public class AuthController {
 
     user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
-    Role userRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
-        .orElseThrow(() -> new AppException("User Role not set."));
-
-    user.setRoles(Collections.singleton(userRole));
-
     User result = userRepository.save(user);
 
     URI location = ServletUriComponentsBuilder
@@ -116,7 +107,7 @@ public class AuthController {
 
       confirmationTokenRepository.save(confirmationToken);
 
-    return ResponseEntity.ok(new ApiResponse(true, "Password reseted successfully! Send request " +
+    return ResponseEntity.ok(new ApiResponse(true, "Password reset successfully! Send request " +
         "with new password to bellow url",
         "http://localhost:8080/api/auth/reset-password?token=" + confirmationToken.getConfirmationToken()));
   }

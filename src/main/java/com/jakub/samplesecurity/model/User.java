@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -45,5 +46,13 @@ public class User extends DateAudit {
 
   public User(String username) {
     this.username = username;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public Set<String> getRoleStringNames() {
+    return roles.stream().map(Role::getName).collect(Collectors.toSet());
   }
 }

@@ -42,7 +42,7 @@ public class UserController {
   }
 
   @GetMapping("/users/{username}")
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('CREATE_USER')")
   public UserProfile getUserProfile(@PathVariable(value = "username") String username) {
     User user = userRepository.findByUsername(username)
         .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));

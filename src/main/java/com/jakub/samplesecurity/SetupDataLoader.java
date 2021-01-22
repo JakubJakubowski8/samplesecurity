@@ -50,19 +50,16 @@ import java.util.Set;
         return;
       }
 
-      // create initial rights
       final Right createRight = createRightIfNotFound(RightName.ROLE_CREATE_USER);
       final Right updateRight = createRightIfNotFound(RightName.ROLE_UPDATE_USER);
       final Right deleteRight = createRightIfNotFound(RightName.ROLE_DELETE_USER);
       final Right listUserRight = createRightIfNotFound(RightName.ROLE_LIST_USER);
 
-      // create admin role
-      final Set<Right> adminRights = new HashSet<>(Arrays.asList(createRight));
-//          updateRight, deleteRight, listUserRight));
+      final Set<Right> adminRights = new HashSet<>(Arrays.asList(createRight,
+          updateRight, deleteRight, listUserRight));
 
       final Role adminRole = createRoleIfNotFound(RoleName.ROLE_ADMIN.name(), adminRights);
 
-      // create admin user
       createUserIfNotFound( "admin", "password", new HashSet<>(Collections.singleton(adminRole)));
 
       alreadySetup = true;

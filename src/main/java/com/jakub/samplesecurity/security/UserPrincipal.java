@@ -1,6 +1,8 @@
 package com.jakub.samplesecurity.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jakub.samplesecurity.model.Role;
+import com.jakub.samplesecurity.model.RoleName;
 import com.jakub.samplesecurity.model.User;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -13,8 +15,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -32,8 +36,15 @@ public class UserPrincipal implements UserDetails {
   private Collection<? extends GrantedAuthority> authorities;
 
   public static UserPrincipal create(User user) {
-    List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
-        new SimpleGrantedAuthority(role.getName().name())
+
+    Set<String> rights = getRights(user.getRoles());
+
+    if (user.getRoleStringNames().contains(RoleName.ROLE_ADMIN.name())) {
+      rights.add(RoleName.ROLE_ADMIN.name());
+    }
+
+    List<GrantedAuthority> authorities =
+        rights.stream().map(SimpleGrantedAuthority::new
     ).collect(Collectors.toList());
 
     return new UserPrincipal(
@@ -42,6 +53,16 @@ public class UserPrincipal implements UserDetails {
         user.getPassword(),
         authorities
     );
+  }
+
+  private static Set<String> getRights(Set<Role> roles) {
+
+    Set<String> rights = new HashSet<>();
+    roles.forEach(role -> rights.addAll(
+        role.getRight().stream().map(right -> right.getName().name()).collect(Collectors.toList()))
+    );
+    return rights;
+
   }
 
   @Override
