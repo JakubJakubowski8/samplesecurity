@@ -1,7 +1,5 @@
 package com.jakub.samplesecurity.payload;
 
-import com.jakub.samplesecurity.model.RoleName;
-
 import lombok.Getter;
 import lombok.Setter;
 

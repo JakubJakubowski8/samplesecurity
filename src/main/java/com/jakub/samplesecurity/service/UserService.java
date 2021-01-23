@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -38,20 +37,20 @@ public class UserService {
 
   public User updateUser(UserRequest userRequest) {
 
-    User user = userRepository.findByUsername(userRequest.getUsername())
-        .orElse(createUser(userRequest));
-
-    return userRepository.save(user);
+    User user = findUserByUsername(userRequest.getUsername());
+    return saveUser(user, userRequest);
   }
 
-  public void deleteUser(Long id) {
+  public void deleteUser(String username) {
 
-    User user = userRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-
+    User user = findUserByUsername(username);
     userRepository.delete(user);
   }
 
+  public Page<User> findAllUsers(Pageable pageable) {
+
+    return userRepository.findAll(pageable);
+  }
 
   private User saveUser(UserRequest userRequest) {
 
@@ -59,7 +58,7 @@ public class UserService {
   }
 
   private User saveUser(User user, UserRequest userRequest) {
-    Set<Role> roles = findRoles(userRequest.getRoles());
+    Set<Role> roles = roleRepository.findByNameIn(userRequest.getRoles());
 
     user.setUsername(userRequest.getUsername());
     user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
@@ -68,21 +67,16 @@ public class UserService {
     return userRepository.save(user);
   }
 
-  private Set<Role> findRoles(Set<String> roleNames) {
-    return
-        roleNames.stream().map(
-            role -> roleRepository.findByName(role)
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "role", role)))
-            .collect(Collectors.toSet());
+  private User findUserByUsername(String username) {
+
+    return userRepository.findByUsername(username)
+        .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
   }
 
   private void checkIfUsernameTaken(UserRequest userRequest) {
+
     if(userRepository.existsByUsername(userRequest.getUsername())) {
       throw new UsernameTakenException(userRequest.getUsername());
     }
-  }
-
-  public Page<User> findAllUsers(Pageable pageable) {
-    return userRepository.findAll(pageable);
   }
 }

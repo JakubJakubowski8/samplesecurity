@@ -46,11 +46,11 @@ public class UserController {
         HttpStatus.OK);
   }
 
-  @DeleteMapping("/user/delete/{id}")
+  @DeleteMapping("/user/delete/{username}")
   @PreAuthorize("hasRole('DELETE_USER')")
-  public ResponseEntity<?> updateUser(@PathVariable(value = "id") Long id) {
+  public ResponseEntity<?> updateUser(@PathVariable(value = "username") String username) {
 
-    userService.deleteUser(id);
+    userService.deleteUser(username);
 
     return new ResponseEntity<>(new ApiResponse(true, "User deleted successfully!", ""),
         HttpStatus.OK);
