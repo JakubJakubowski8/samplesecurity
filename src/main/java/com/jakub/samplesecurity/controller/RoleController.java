@@ -33,7 +33,12 @@ public class RoleController {
     this.roleService = roleService;
   }
 
-
+  /**
+   * Create new Role
+   *
+   * @param roleRequest role data
+   * @return Confirmation
+   */
   @PostMapping("/role/create")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> createRole(@Valid @RequestBody RoleRequest roleRequest) {
@@ -44,6 +49,12 @@ public class RoleController {
         HttpStatus.CREATED);
   }
 
+  /**
+   * Update Role
+   *
+   * @param roleRequest role data
+   * @return Confirmation
+   */
   @PutMapping("/role/update")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> updateRole(@Valid @RequestBody RoleRequest roleRequest) {
@@ -54,6 +65,12 @@ public class RoleController {
         HttpStatus.OK);
   }
 
+  /**
+   * Delete Role
+   *
+   * @param name role name
+   * @return Confirmation
+   */
   @DeleteMapping("/role/delete/{name}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> updateUser(@PathVariable(value = "name") String name) {
@@ -64,6 +81,12 @@ public class RoleController {
         HttpStatus.OK);
   }
 
+  /**
+   * Get all Roles
+   *
+   * @param pageable Pageable
+   * @return All roles paged
+   */
   @GetMapping("/role/all")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getAllRoles(Pageable pageable) {

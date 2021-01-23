@@ -30,6 +30,12 @@ public class AuthController {
     this.authService = authService;
   }
 
+  /**
+   * Login to app.
+   *
+   * @param loginRequest user credentials
+   * @return authentication token
+   */
   @PostMapping("/login")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -38,6 +44,12 @@ public class AuthController {
     return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
   }
 
+  /**
+   * Forgot password endpoint
+   *
+   * @param username user name
+   * @return confirmation token
+   */
   @PostMapping(value="/forgot-password/{username}")
   public ResponseEntity<?> forgotUserPassword(@Valid @PathVariable(value = "username") String username) {
 
@@ -49,6 +61,13 @@ public class AuthController {
         "http://localhost:8080/api/auth/reset-password?token=" + confToken.getConfirmationToken()));
   }
 
+  /**
+   * Reset password endpoint
+   *
+   * @param token confirmation token
+   * @param resetPasswordRequest new user password
+   * @return confirmation
+   */
   @PostMapping(value="/reset-password")
   public ResponseEntity<?> forgotUserPassword(@Valid @RequestParam("token") String token,
                                               @Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {

@@ -23,9 +23,16 @@ public class UserController {
 
   @Autowired
   public UserController(UserService userService) {
+
     this.userService = userService;
   }
 
+  /**
+   * Create new User
+   *
+   * @param userRequest user data
+   * @return Confirmation
+   */
   @PostMapping("/user/create")
   @PreAuthorize("hasRole('CREATE_USER')")
   public ResponseEntity<?> createUser(@Valid @RequestBody UserRequest userRequest) {
@@ -36,6 +43,12 @@ public class UserController {
         HttpStatus.CREATED);
   }
 
+  /**
+   * Update User
+   *
+   * @param userRequest user data
+   * @return Confirmation
+   */
   @PutMapping("/user/update")
   @PreAuthorize("hasRole('UPDATE_USER')")
   public ResponseEntity<?> updateUser(@Valid @RequestBody UserRequest userRequest) {
@@ -46,6 +59,12 @@ public class UserController {
         HttpStatus.OK);
   }
 
+  /**
+   * Update User
+   *
+   * @param  username username
+   * @return Confirmation
+   */
   @DeleteMapping("/user/delete/{username}")
   @PreAuthorize("hasRole('DELETE_USER')")
   public ResponseEntity<?> updateUser(@PathVariable(value = "username") String username) {
@@ -56,6 +75,12 @@ public class UserController {
         HttpStatus.OK);
   }
 
+  /**
+   * Get all Users
+   *
+   * @param  pageable Pageable
+   * @return All users paged
+   */
   @GetMapping("/user/all")
   @PreAuthorize("hasRole('LIST_USER')")
   public ResponseEntity<?> getAllUsers(Pageable pageable) {
