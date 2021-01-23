@@ -1,9 +1,9 @@
 package com.jakub.samplesecurity.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jakub.samplesecurity.model.audit.DateAudit;
 
-import net.minidev.json.annotate.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -48,11 +48,6 @@ public class User extends DateAudit {
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Role> roles = new HashSet<>();
-
-  @JsonProperty("password")
-  public String getPassword() {
-    return password;
-  }
 
   public Set<String> getRoleStringNames() {
     return roles.stream().map(Role::getName).collect(Collectors.toSet());

@@ -12,7 +12,7 @@ public class RoleInUseException extends RuntimeException {
   private String role;
 
   public RoleInUseException(String role) {
-    super(String.format("Role %s is in use!", role));
+    super(String.format("Role %s is in use! You can't delete it.", role));
     this.role = role;
   }
 }

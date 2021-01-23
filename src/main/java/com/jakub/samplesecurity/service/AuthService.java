@@ -85,14 +85,12 @@ public class AuthService {
 
     return
         userRepository.findByUsername(username)
-            .orElseThrow(() -> new ResourceNotFoundException("User", "username",
-                username));
+            .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
   }
 
   private ConfirmationToken findToken(String token) {
 
     return confirmationTokenRepository.findByConfirmationToken(token)
-        .orElseThrow(() -> new ResourceNotFoundException("Forgot password token", "token",
-            token));
+        .orElseThrow(() -> new ResourceNotFoundException("ConfirmationToken", "token", token));
   }
 }
