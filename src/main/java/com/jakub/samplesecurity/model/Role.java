@@ -1,6 +1,5 @@
 package com.jakub.samplesecurity.model;
 
-
 import org.hibernate.annotations.NaturalId;
 
 import lombok.AllArgsConstructor;
@@ -18,6 +17,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Table(name = "roles")
 public class Role {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -36,5 +36,4 @@ public class Role {
           name = "right_id", referencedColumnName = "id"))
   @Setter
   private Set<Right> right;
-
 }

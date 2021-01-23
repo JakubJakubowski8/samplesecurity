@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 public class ResetPasswordRequest {
+
   @NotBlank
   private String password;
 }

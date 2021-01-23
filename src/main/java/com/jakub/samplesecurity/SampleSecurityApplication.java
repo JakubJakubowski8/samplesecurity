@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 public class SampleSecurityApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(SampleSecurityApplication.class, args);
 	}
-
 }

@@ -3,7 +3,6 @@ package com.jakub.samplesecurity.service;
 import com.jakub.samplesecurity.exception.ResourceNotFoundException;
 import com.jakub.samplesecurity.model.ConfirmationToken;
 import com.jakub.samplesecurity.model.User;
-import com.jakub.samplesecurity.payload.ForgotPasswordRequest;
 import com.jakub.samplesecurity.payload.LoginRequest;
 import com.jakub.samplesecurity.payload.ResetPasswordRequest;
 import com.jakub.samplesecurity.repository.ConfirmationTokenRepository;
@@ -31,6 +30,7 @@ public class AuthService {
                      UserRepository userRepository,
                      PasswordEncoder passwordEncoder,
                      JwtTokenProvider tokenProvider) {
+
     this.authenticationManager = authenticationManager;
     this.confirmationTokenRepository = confirmationTokenRepository;
     this.userRepository = userRepository;
@@ -46,9 +46,9 @@ public class AuthService {
 
   }
 
-  public ConfirmationToken createConfirmationToken(ForgotPasswordRequest forgotPasswordRequest) {
+  public ConfirmationToken createConfirmationToken(String username) {
 
-    User existingUser = findUser(forgotPasswordRequest.getUsername());
+    User existingUser = findUser(username);
 
     ConfirmationToken confirmationToken = new ConfirmationToken(existingUser);
 

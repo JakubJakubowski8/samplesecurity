@@ -26,10 +26,10 @@ import java.util.Set;
 
     private boolean alreadySetup = false;
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private RightRepository rightRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final RightRepository rightRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public SetupDataLoader(UserRepository userRepository,

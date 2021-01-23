@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
     })
 })
 public class User extends DateAudit {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

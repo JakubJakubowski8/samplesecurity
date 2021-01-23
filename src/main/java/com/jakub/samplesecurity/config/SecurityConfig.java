@@ -7,7 +7,6 @@ import com.jakub.samplesecurity.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -36,17 +35,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtAuthenticationEntryPoint unauthorizedHandler) {
+
     this.customUserDetailsService = customUserDetailsService;
     this.unauthorizedHandler = unauthorizedHandler;
   }
 
   @Bean
   public JwtAuthenticationFilter jwtAuthenticationFilter() {
+
     return new JwtAuthenticationFilter();
   }
 
   @Override
   public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+
     authenticationManagerBuilder
         .userDetailsService(customUserDetailsService)
         .passwordEncoder(passwordEncoder());
@@ -55,16 +57,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Bean(BeanIds.AUTHENTICATION_MANAGER)
   @Override
   public AuthenticationManager authenticationManagerBean() throws Exception {
+
     return super.authenticationManagerBean();
   }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
+
     return new BCryptPasswordEncoder();
   }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
+
     http
         .cors()
         .and()
@@ -89,15 +94,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .permitAll()
         .antMatchers("/api/auth/**")
         .permitAll()
-        .antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
+        .antMatchers("/api/user/**")
         .permitAll()
-        .antMatchers(HttpMethod.GET,  "/api/users/**")
+        .antMatchers( "/api/role/**")
         .permitAll()
         .anyRequest()
         .authenticated();
 
-    // Add our custom JWT security filter
     http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
   }
 }

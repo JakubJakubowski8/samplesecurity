@@ -23,5 +23,4 @@ public abstract class UserDateAudit extends DateAudit {
 
   @LastModifiedBy
   private Long updatedBy;
-
 }

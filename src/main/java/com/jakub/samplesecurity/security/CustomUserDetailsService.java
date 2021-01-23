@@ -19,6 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Autowired
   public CustomUserDetailsService(UserRepository userRepository) {
+
     this.userRepository = userRepository;
   }
 
@@ -26,6 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   @Transactional
   public UserDetails loadUserByUsername(String username)
       throws UsernameNotFoundException {
+
     User user = userRepository.findByUsername(username)
         .orElseThrow(() ->
             new UsernameNotFoundException("User not found with username : " + username)
@@ -36,6 +38,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Transactional
   public UserDetails loadUserById(Long id) {
+
     User user = userRepository.findById(id).orElseThrow(
         () -> new ResourceNotFoundException("User", "id", id)
     );

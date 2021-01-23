@@ -3,13 +3,13 @@ package com.jakub.samplesecurity.controller;
 import com.jakub.samplesecurity.model.ConfirmationToken;
 import com.jakub.samplesecurity.payload.ResetPasswordRequest;
 import com.jakub.samplesecurity.payload.ApiResponse;
-import com.jakub.samplesecurity.payload.ForgotPasswordRequest;
 import com.jakub.samplesecurity.payload.JwtAuthenticationResponse;
 import com.jakub.samplesecurity.payload.LoginRequest;
 import com.jakub.samplesecurity.service.AuthService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,11 +38,11 @@ public class AuthController {
     return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
   }
 
-  @PostMapping(value="/forgot-password")
-  public ResponseEntity<?> forgotUserPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+  @PostMapping(value="/forgot-password/{username}")
+  public ResponseEntity<?> forgotUserPassword(@Valid @PathVariable(value = "username") String username) {
 
     ConfirmationToken confToken =
-        authService.createConfirmationToken(forgotPasswordRequest);
+        authService.createConfirmationToken(username);
 
     return ResponseEntity.ok(new ApiResponse(true, "Password reset successfully! Send request " +
         "with new password to bellow url",
