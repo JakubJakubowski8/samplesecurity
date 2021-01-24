@@ -72,8 +72,7 @@ log in, reset password, create users, create roles, and give permissions.
 To secure app I used Spring Security and JWT. 
 
 This service is Dockerized. To simplify I used Spring-Boot BuildPacks to create Docker Image and
-because of that DockerFile is unnecessary. To create a new Docker Image and push it to [Docker Hub]
-(https://hub.docker.com/r/jakubjakubowski/samplesecurity)
+because of that DockerFile is unnecessary. To create a new Docker Image and push it to [Docker Hub](https://hub.docker.com/r/jakubjakubowski/samplesecurity)
 just start below script:  
 ```sh create_docker_image.sh```
 
