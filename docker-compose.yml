@@ -10,7 +10,7 @@ services:
     ports:
       - 3306:3306
   samplesecurity:
-    image: jakubjakubowski/samplesecurity:0.0.1-SNAPSHOT
+    image: jakubjakubowski/samplesecurity:1.0.0
     depends_on:
       - db-mysql
     restart: on-failure

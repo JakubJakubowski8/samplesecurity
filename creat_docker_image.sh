@@ -1,6 +1,6 @@
 #!/bin/sh
 
-TAG="0.0.1-SNAPSHOT"
+TAG="1.0.0"
 DOCKER_USER=user
 DOCKER_PASSWORD=password
 ./mvnw spring-boot:build-image
